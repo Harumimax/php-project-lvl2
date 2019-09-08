@@ -1,0 +1,26 @@
+{
+    "name": "harumimax/gen-diff",
+    "description": "utility to find differences in configuration files",
+    "keywords": [
+        "hexlet",
+        "second project",
+        "gen-diff"
+    ],
+    "type": "project",
+    "authors": [
+        {
+            "name": "harumimax",
+            "email": "harumimax@gmail.com"
+        }
+    ],
+    "scripts": {
+        "phpcs": "phpcs",
+        "phpcbf": "phpcbf"
+    },
+    "require": {
+        "docopt/docopt": "^1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*"
+    }
+}
