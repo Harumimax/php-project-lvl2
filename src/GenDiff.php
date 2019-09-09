@@ -20,30 +20,29 @@ class GenDiff
     {
         $this->diff = [];
         $afterArrWithoutBefore = $this->afterArr;
-        foreach($this->beforeArr as $key => $value) {
+        foreach ($this->beforeArr as $key => $value) {
             if (array_key_exists($key, $this->afterArr)) {
-
                 if ($this->beforeArr[$key] == $this->afterArr[$key]) {
                     $this->diff[$key] = $value;
                 } else {
-                    $this->diff["+"."{$key}"] = $this->afterArr[$key];
-                    $this->diff["-"."{$key}"] = $value;
+                    $this->diff["+" . "{$key}"] = $this->afterArr[$key];
+                    $this->diff["-" . "{$key}"] = $value;
                 }
                 $afterArrWithoutBefore = \Funct\Collection\without($afterArrWithoutBefore, $this->afterArr[$key]);
             } else {
-                $this->diff["-"."{$key}"] = $value;
+                $this->diff["-" . "{$key}"] = $value;
             }
         }
 
-        foreach($afterArrWithoutBefore as $key => $value){
-            $this->diff["+"."{$key}"] = $value;
+        foreach ($afterArrWithoutBefore as $key => $value) {
+            $this->diff["+" . "{$key}"] = $value;
         }
     }
 
     public function toStr()
     {
         $resultArr = [];
-        foreach($this->diff as $key => $value) {
+        foreach ($this->diff as $key => $value) {
             if ($key[0] == "-" || $key[0] == "+") {
                 $resultArr[] = "   {$key}: {$value}\n";
             } else {
@@ -54,5 +53,4 @@ class GenDiff
 
         return "{\n{$resultStr}}\n";
     }
-
 }

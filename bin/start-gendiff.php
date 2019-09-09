@@ -7,10 +7,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require('../src/docopt.php');
 
 $params = array(
-    'argv'=>array_slice($_SERVER['argv'], 1),
-    'help'=>true,
-    'version'=>'GenDiff by harumimax 1.0.1',
-    'optionsFirst'=>false,
+    'argv' => array_slice($_SERVER['argv'], 1),
+    'help' => true,
+    'version' => 'GenDiff by harumimax 1.0.1',
+    'optionsFirst' => false,
 );
 
 $handler = new \Docopt\Handler($params);
