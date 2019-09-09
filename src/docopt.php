@@ -1,13 +1,16 @@
 <?php
+
 $doc = <<<DOC
 Generate diff
 
 Usage:
   gendiff (-h|--help)
-  gendiff [--format <fmt>] <firstFile> <secondFile>
+  gendiff [FILE] ...
+  gendiff [--format <fmt>] [FILE] ...
 
 Options:
   -h --help                     Show this screen
-  --format <fmt>                Report format [default: pretty]
+  -v --version                  Show gendiff version
+  --format=<kn>                 Report format [default: pretty]
 
 DOC;

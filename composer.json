@@ -15,12 +15,24 @@
     ],
     "scripts": {
         "phpcs": "phpcs",
-        "phpcbf": "phpcbf"
+        "phpcbf": "phpcbf",
+        "phpunit": "phpunit"
     },
     "require": {
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "funct/funct": "^1.5"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "*",
+        "phpunit/phpunit": "^8.3"
+    },
+    "bin": [
+        "start-gendiff.php"
+    ],
+    "autoload": {
+        "psr-4": {"Differ\\": "src/"},
+        "files": [
+            "src/engine.php"
+        ]
     }
 }
