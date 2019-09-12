@@ -4,6 +4,10 @@ namespace Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
 
+Use function \Differ\LibDiffer\getDataArray;
+Use function \Differ\LibDiffer\findDiff;
+Use function \Differ\LibDiffer\toStr;
+
 class GenDiffTest extends TestCase
 {
     private $diff;
