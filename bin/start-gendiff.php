@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use function \Differ\genDiff;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require('../src/docopt.php');
 
@@ -13,10 +15,9 @@ $params = array(
 
 $handler = new \Docopt\Handler($params);
 $handler->handle($doc, $argv);
-print_r($argv);
 
 try {
-    echo \Differ\genDiff($argv[1], $argv[2]);
+    echo genDiff($argv[1], $argv[2]);
 } catch (Exception $e) {
     echo 'Exception: ',  $e->getMessage(), "\n";
 }

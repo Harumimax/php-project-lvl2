@@ -98,7 +98,7 @@ class GenDiffTest extends TestCase
 
         $this->assertIsArray($request);
 
-        $this->assertEquals(3, sizeof($request));
+        $this->assertEquals(4, sizeof($request));
         $this->assertTrue(array_key_exists('timeout', $request));
         $this->assertTrue(array_key_exists('-host', $request));
         $this->assertTrue(array_key_exists('+host', $request));
@@ -112,7 +112,8 @@ class GenDiffTest extends TestCase
             '+timeout' => 20,
             '-timeout' => 50,
             '-proxy' => '123.234.53.22',
-            '+verbose' => 1];
+            '+verbose' => 1,
+            'offset' => 1];
         
         $this->assertFalse(empty(toStr($data)));
     }
@@ -124,7 +125,8 @@ class GenDiffTest extends TestCase
         '+timeout' => 20,
         '-timeout' => 50,
         '-proxy' => '123.234.53.22',
-        '+verbose' => 1];
+        '+verbose' => 1,
+        'offset' => 1];
         
         $request = toStr($data);
             

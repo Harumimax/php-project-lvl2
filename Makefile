@@ -12,3 +12,6 @@ phpfix:
 
 test:
 	composer run-script phpunit tests
+
+push:
+	git push origin master
