@@ -7,5 +7,5 @@
     "foo": "bar",
     "baz": "bars"
   },
-  "new group": "new value"
+  "new group": true
 }

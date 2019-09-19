@@ -16,8 +16,20 @@ $params = array(
 $handler = new \Docopt\Handler($params);
 $handler->handle($doc, $argv);
 
+//print_r($argv);
+
 try {
-    echo genDiff($argv[1], $argv[2]);
+    if ($argv[1] == "--format") {
+        $beforePath = $argv[3];
+        $afterPath = $argv[4];
+        $format = $argv[2];
+    } else {
+        $beforePath = $argv[1];
+        $afterPath = $argv[2];
+        $format = "pretty";
+    }
+
+    echo genDiff($beforePath, $afterPath, $format);
 } catch (Exception $e) {
     echo 'Exception: ',  $e->getMessage(), "\n";
 }
