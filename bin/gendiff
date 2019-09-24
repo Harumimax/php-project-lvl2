@@ -4,7 +4,7 @@
 use function \Differ\genDiff;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require('../src/docopt.php');
+require_once __DIR__ . '/../src/docopt.php';
 
 $params = array(
     'argv' => array_slice($_SERVER['argv'], 1),
