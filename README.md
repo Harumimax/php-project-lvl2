@@ -15,3 +15,4 @@ gendiff [--format <fmt>] < firstFile > < secondFile ><br><br>
 JSON, YAML, default: pretty <br><br>
 
 <b><u>example</u>:</b> <br>
+[![asciicast](https://asciinema.org/a/75s2wTcxCNVQNm8G4vF5zwI9R.svg)](https://asciinema.org/a/75s2wTcxCNVQNm8G4vF5zwI9R)
