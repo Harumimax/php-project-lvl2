@@ -28,7 +28,7 @@
         "phpunit/phpunit": "^8.3"
     },
     "bin": [
-        "bin/start-gendiff.php"
+        "bin/gendiff"
     ],
     "autoload": {
         "files": [
