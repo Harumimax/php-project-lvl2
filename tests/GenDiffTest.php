@@ -8,6 +8,7 @@ Use function \Differ\LibDiffer\getDataArray;
 Use function \Differ\LibDiffer\findDiff;
 Use function \Differ\LibDiffer\toStr;
 Use function \Differ\LibDiffer\toPlain;
+use function \Differ\LibDiffer\toSimpleArray;
 
 class GenDiffTest extends TestCase
 {
@@ -92,5 +93,20 @@ class GenDiffTest extends TestCase
         $this->assertStringContainsString("new.host", $request);
         $this->assertStringContainsString("host", $request);
         $this->assertFalse(strpos($request, "timeout"));
+    }
+
+    public function testToSimpleArray()
+    {
+        $data = findDiff($this->before, $this->after);
+        $request = toSimpleArray($data);
+            
+        $this->assertIsArray($request);
+        $this->assertEquals(3, sizeof($request));
+        $this->assertTrue(array_key_exists('timeout', $request));
+
+        $result = json_encode($request);
+        $this->assertStringContainsString("hexlet.io", $result);
+        $this->assertStringContainsString("new.host", $result);
+        $this->assertStringContainsString("host", $result);
     }
 }
