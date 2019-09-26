@@ -60,8 +60,8 @@ class GenDiffTest extends TestCase
         $this->assertIsArray($request);
 
         $this->assertEquals(2, sizeof($request));
-        $this->assertTrue(array_key_exists('timeout', $request));
-        $this->assertTrue(array_key_exists('host', $request));
+        $this->assertFalse(array_key_exists('timeout', $request));
+        $this->assertFalse(in_array('host', $request));
     }
 
 

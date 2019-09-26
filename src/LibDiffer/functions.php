@@ -25,46 +25,50 @@ function getDataArray($filePath): array
 
 function findDiff($beforeArr, $afterArr, $offset = 1): array
 {
-    $result = [];
-    foreach ($beforeArr as $key => $value) {
+    $prepareTreeFromBeforeArr = array_map(function ($key, $value) use ($afterArr, $offset) {
         if (is_bool($value)) {
             $value = changeTypeBoolToStr($value);
         }
 
         if (array_key_exists($key, $afterArr)) {
             if ($value == $afterArr[$key]) {
-                    $result[$key] = ['type' => 'same', 'value' => $value, 'offset' => $offset];
+                    return ['type' => 'same', 'key' => $key, 'value' => $value, 'offset' => $offset];
             } else {
                 if (is_array($value)) {
                     $arrayValue = findDiff($value, $afterArr[$key], $offset + 1);
-                    $result[$key] = ['type' => 'array', 'value' => $arrayValue, 'offset' => $offset];
+                    return ['type' => 'array', 'key' => $key, 'value' => $arrayValue, 'offset' => $offset];
                 } else {
-                    $result[$key] =
-                    ['type' => 'change', 'old-value' => $value, 'new-value' => $afterArr[$key], 'offset' => $offset];
+                    return
+                    ['type' => 'change', 'key' => $key, 'old-value' => $value,
+                    'new-value' => $afterArr[$key], 'offset' => $offset];
                 }
             }
-            unset($afterArr[$key]);
         } else {
-                $result[$key] = ['type' => 'delete', 'value' => $value, 'offset' => $offset];
             if (is_array($value)) {
-                $result[$key]['value']['offset'] = $offset + 1;
+                $value['offset'] = $offset + 1;
+                return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
+            } else {
+                return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
             }
         }
-    }
+    }, array_keys($beforeArr), $beforeArr);
 
-    foreach ($afterArr as $key => $value) {
+    $diffBetweenTwoArray = array_diff_key($afterArr, $beforeArr);
+
+    $newValuesFromAfterArr = array_map(function ($key, $value) use ($offset) {
         if (is_bool($value)) {
             $value = changeTypeBoolToStr($value);
         }
 
-        $result[$key] = ['type' => 'new', 'value' => $value, 'offset' => $offset];
         if (is_array($value)) {
-            $result[$key]['value']['offset'] = $offset + 1;
+            $value['offset'] = $offset + 1;
+            return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
+        } else {
+            return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
         }
-    }
-    //print_r($result);
+    }, array_keys($diffBetweenTwoArray), $diffBetweenTwoArray);
 
-    return $result;
+    return array_merge($prepareTreeFromBeforeArr, $newValuesFromAfterArr);
 }
 
 function changeTypeBoolToStr(bool $value): string
@@ -74,7 +78,7 @@ function changeTypeBoolToStr(bool $value): string
 
 function toStr($diff): string
 {
-    $resultArray = array_map(function ($key, $value) {
+    $resultArray = array_map(function ($value) {
         $offset = str_repeat("  ", $value['offset']);
 
         if ($value['type'] == 'delete' || $value['type'] == 'new') {
@@ -94,19 +98,19 @@ function toStr($diff): string
         }
 
         if ($value['type'] == 'same') {
-            return "{$offset}  {$key}: {$value['value']}\n";
+            return "{$offset}  {$value['key']}: {$value['value']}\n";
         } elseif ($value['type'] == 'delete') {
-            return "{$offset}- {$key}: {$valueToString}\n";
+            return "{$offset}- {$value['key']}: {$valueToString}\n";
         } elseif ($value['type'] == 'new') {
-            return "{$offset}+ {$key}: {$valueToString}\n";
+            return "{$offset}+ {$value['key']}: {$valueToString}\n";
         } elseif ($value['type'] == 'change') {
-            return ["{$offset}+ {$key}: {$value['new-value']}\n",
-                    "{$offset}- {$key}: {$value['old-value']}\n"];
+            return ["{$offset}+ {$value['key']}: {$value['new-value']}\n",
+                    "{$offset}- {$value['key']}: {$value['old-value']}\n"];
         } elseif ($value['type'] == 'array') {
             $arrayValue = toStr($value['value']);
-            return "{$offset}  {$key}: {$arrayValue}\n";
+            return "{$offset}  {$value['key']}: {$arrayValue}\n";
         }
-    }, array_keys($diff), $diff);
+    }, $diff);
 
     $flattenedResultArray = Collection\flattenAll($resultArray);
     $resultToString = implode('', $flattenedResultArray);
@@ -117,9 +121,9 @@ function toStr($diff): string
 function toPlain($diff, $header = ""): string
 {
 
-    $result = array_map(function ($key, $value) use ($header) {
+    $result = array_map(function ($value) use ($header) {
 
-        $newHeader = (empty($header)) ? $key : "{$header}.{$key}";
+        $newHeader = (empty($header)) ? $value['key'] : "{$header}.{$value['key']}";
         if ($value['type'] != 'change') {
             $newValue = (is_array($value['value'])) ? "complex value" : $value['value'];
         } else {
@@ -136,7 +140,7 @@ function toPlain($diff, $header = ""): string
         } elseif ($value['type'] == 'array') {
             return toPlain($value['value'], $newHeader);
         }
-    }, array_keys($diff), $diff);
+    }, $diff);
 
     return implode("\n", array_diff($result, array('')));
 }
@@ -145,6 +149,63 @@ function toSimpleArray(array $diff): array
 {
     $result = [];
     foreach ($diff as $key => $value) {
+        if ($value['type'] == 'same') {
+                $result[$value['key']] = $value['value'];
+        } elseif ($value['type'] == 'delete') {
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                unset($value['value']['offset']);
+            }
+              $result["- {$value['key']}"] = $value['value'];
+        } elseif ($value['type'] == 'new') {
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                unset($value['value']['offset']);
+            }
+             $result["+ {$value['key']}"] = $value['value'];
+        } elseif ($value['type'] == 'change') {
+            $result["+ {$value['key']}"] = $value['new-value'];
+            $result["- {$value['key']}"] = $value['old-value'];
+        } elseif ($value['type'] == 'array') {
+            $arrayValue = toSimpleArray($value['value']);
+            $result[$value['key']] = $arrayValue;
+        }
+    }
+
+    /*
+    print_r($diff);
+
+    $diffCollection = collect($diff);
+    $resultCollection = $diffCollection->map(function ($value, $key) {
+        if ($value['type'] == 'same') {
+            return ["{$value['key']}" => $value['value']];
+        } elseif ($value['type'] == 'delete') {
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                unset($value['value']['offset']);
+            }
+            return ["- {$value['key']}" => $value['value']];
+        } elseif ($value['type'] == 'new') {
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                unset($value['value']['offset']);
+            }
+            return ["+ {$value['key']}" => $value['value']];
+        } elseif ($value['type'] == 'change') {
+            return ["+ {$value['key']}" => $value['new-value'], "- {$value['key']}" => $value['old-value']];
+        } elseif ($value['type'] == 'array') {
+            $arrayValue = toSimpleArray($value['value']);
+            return ["{$value['key']}" => $arrayValue];
+        }
+    });
+
+    $result = $resultCollection->all(); //->flatten(0)
+
+    print_r($result);
+    */
+
+
+    
+    
+    /*
+    $result = array_map(function ($value) {
+
         if ($value['type'] == 'same') {
                 $result[$key] = $value['value'];
         } elseif ($value['type'] == 'delete') {
@@ -164,7 +225,9 @@ function toSimpleArray(array $diff): array
             $arrayValue = toSimpleArray($value['value']);
             $result[$key] = $arrayValue;
         }
-    }
 
+    }, $diff);
+    */
+    
     return $result;
 }
