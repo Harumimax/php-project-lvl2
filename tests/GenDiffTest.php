@@ -4,53 +4,90 @@ namespace Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-Use function \Differ\LibDiffer\getDataArray;
-Use function \Differ\LibDiffer\findDiff;
-Use function \Differ\LibDiffer\toStr;
-Use function \Differ\LibDiffer\toPlain;
+use function \Differ\genDiff;
+use function \Differ\LibDiffer\getDataArray;
+use function \Differ\LibDiffer\findDiff;
+use function \Differ\LibDiffer\toStr;
+use function \Differ\LibDiffer\toPlain;
 use function \Differ\LibDiffer\toSimpleArray;
 
 class GenDiffTest extends TestCase
 {
-    private $path;
-
     private $before;
     private $after;
 
-    public function testGetDataArray()
+    public function testGenDiffFormatPrettyFileJson()
     {
-        if(file_exists($this->path)){
-            rmdir($this->path);
-        }
-        $temp = sys_get_temp_dir();
-        $this->path = $temp . DIRECTORY_SEPARATOR . "file1.json";
-        $dataBefore = '{
-            "host": "hexlet.io",
-            "timeout": 50,
-            "proxy": "123.234.53.22"
-          }';
-        
-        file_put_contents($this->path, $dataBefore);
+        $beforeFilePath = 'tests/files/before.json';
+        $afterFilePath = 'tests/files/after.json';
+        $format = 'pretty';
+        $request = genDiff($beforeFilePath, $afterFilePath, $format);
 
-        $request = getDataArray($this->path);
-        $this->assertIsArray($request);
+        $this->assertIsString($request);
         $this->assertFalse(empty($request));
 
+        $this->assertStringContainsString("common", $request);
+        $this->assertStringContainsString("setting4", $request);
+        $this->assertStringContainsString("100500", $request);
     }
 
-    protected function tearDown(): void 
+    
+    public function testGenDiffFormatPrettyYaml()
     {
-        if(file_exists($this->path)){
-            unlink($this->path);
-        }
+        $beforeFilePath = 'tests/files/before.yaml';
+        $afterFilePath = 'tests/files/after.yaml';
+        $format = 'pretty';
+        $request = genDiff($beforeFilePath, $afterFilePath, $format);
+
+        $this->assertIsString($request);
+        $this->assertFalse(empty($request));
+
+        $this->assertStringContainsString("timeout", $request);
+        $this->assertStringContainsString("host", $request);
+        $this->assertStringContainsString("hexlet.io", $request);
+        $this->assertStringContainsString("proxy", $request);
     }
+
+    
+    public function testGenDiffFormatPlainFileJson()
+    {
+        $beforeFilePath = 'tests/files/before.json';
+        $afterFilePath = 'tests/files/after.json';
+        $format = 'plain';
+        $request = genDiff($beforeFilePath, $afterFilePath, $format);
+
+        $this->assertIsString($request);
+        $this->assertFalse(empty($request));
+
+        $this->assertStringContainsString("Property 'common.setting6' was removed", $request);
+        $this->assertStringContainsString("Property 'common.setting5' was added with value: 'complex value'", $request);
+        $this->assertStringContainsString("Property 'group3' was added with value: 'complex value'", $request);
+        $this->assertStringNotContainsString("setting1", $request);
+    }
+
+    public function testGenDiffFormatJsonFileJson()
+    {
+        $beforeFilePath = 'tests/files/before.json';
+        $afterFilePath = 'tests/files/after.json';
+        $format = 'json';
+        $request = genDiff($beforeFilePath, $afterFilePath, $format);
+
+        $this->assertIsString($request);
+        $this->assertFalse(empty($request));
+
+        $this->assertStringContainsString('{"key":"value"}', $request);
+        $this->assertStringContainsString('"group1":{"+ baz":"bars","- baz":"bas","foo":"bar"}', $request);
+        $this->assertStringContainsString('"+ group3":{"foo":"bar","fee":"100500"}', $request);
+    }
+
+
+    // --------------------------------- old tests ---------------------------
 
     protected function setUp(): void
     {
         $this->before = ['timeout' => 50, 'host' => 'hexlet.io'];
         $this->after = ['timeout' => 50, 'host' => 'new.host'];
     }
-
 
     public function testFindDiff()
     {

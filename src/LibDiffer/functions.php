@@ -170,38 +170,61 @@ function toSimpleArray(array $diff): array
         }
     }
 
-    /*
-    print_r($diff);
-
-    $diffCollection = collect($diff);
-    $resultCollection = $diffCollection->map(function ($value, $key) {
-        if ($value['type'] == 'same') {
-            return ["{$value['key']}" => $value['value']];
-        } elseif ($value['type'] == 'delete') {
-            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
-                unset($value['value']['offset']);
-            }
-            return ["- {$value['key']}" => $value['value']];
-        } elseif ($value['type'] == 'new') {
-            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
-                unset($value['value']['offset']);
-            }
-            return ["+ {$value['key']}" => $value['value']];
-        } elseif ($value['type'] == 'change') {
-            return ["+ {$value['key']}" => $value['new-value'], "- {$value['key']}" => $value['old-value']];
-        } elseif ($value['type'] == 'array') {
-            $arrayValue = toSimpleArray($value['value']);
-            return ["{$value['key']}" => $arrayValue];
-        }
-    });
-
-    $result = $resultCollection->all(); //->flatten(0)
-
-    print_r($result);
-    */
 
 
     
+
+    /*
+    $result = array_map(function ($value) {
+        if ($value['type'] == 'same') {
+            return [ $value['key'], $value['value'] ];
+
+        } elseif ($value['type'] == 'delete') {
+
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                    unset($value['value']['offset']);
+                }
+                return ["- {$value['key']}", $value['value'] ];
+
+            } elseif ($value['type'] == 'new') {
+            if (is_array($value['value']) && array_key_exists('offset', $value['value'])) {
+                    unset($value['value']['offset']);
+                }
+                return ["+ {$value['key']}", $value['value']];
+            } elseif ($value['type'] == 'change') {
+
+                return [ ["- {$value['key']}", $value['old-value']],
+                        ["+ {$value['key']}", $value['new-value'] ] ];
+            } elseif ($value['type'] == 'array') {
+                $arrayValue = toSimpleArray($value['value']);
+                return [$value['key'], $arrayValue];
+            }
+
+      }, $diff);
+      print_r($result);
+      $diffCollection = collect($result);
+      $flatten = $diffCollection->flatten()->all();
+      print_r($flatten);
+
+      $array_key = array_filter($flatten, function($value, $key) {
+            if ($key == 0) {
+                return $value;
+            } else {
+                if ($key % 2 == 0) {
+                return $value;
+                }
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+
+  $array_value = array_filter($flatten, function($value, $key) {
+
+            if ($key % 2 !== 0) {
+              return $value;
+            }
+  }, ARRAY_FILTER_USE_BOTH);
+
+  $result = array_combine(array_values($array_key),array_values($array_value));
+*/
     
     /*
     $result = array_map(function ($value) {

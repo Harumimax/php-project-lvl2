@@ -9,27 +9,18 @@ require_once __DIR__ . '/../src/docopt.php';
 $params = array(
     'argv' => array_slice($_SERVER['argv'], 1),
     'help' => true,
-    'version' => 'GenDiff by harumimax 1.0.1',
+    'version' => 'GenDiff by harumimax 1.0.5',
     'optionsFirst' => false,
 );
 
-$handler = new \Docopt\Handler($params);
-$handler->handle($doc, $argv);
-
-//print_r($argv);
+$handler = Docopt::handle($doc, $params);
 
 try {
-    if ($argv[1] == "--format") {
-        $beforePath = $argv[3];
-        $afterPath = $argv[4];
-        $format = $argv[2];
-    } else {
-        $beforePath = $argv[1];
-        $afterPath = $argv[2];
-        $format = "pretty";
-    }
+    $beforeFilePath = $handler->args['<beforeFilePath>'];
+    $afterFilePath = $handler->args['<afterFilePath>'];
+    $format = $handler->args['--format'];
 
-    echo genDiff($beforePath, $afterPath, $format);
+    echo genDiff($beforeFilePath, $afterFilePath, $format);
 } catch (Exception $e) {
     echo 'Exception: ',  $e->getMessage(), "\n";
 }

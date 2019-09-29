@@ -5,11 +5,10 @@ Generate diff
 
 Usage:
   gendiff (-h|--help)
-  gendiff [FILE] ...
-  gendiff [--format <fmt>] [FILE] ...
+  gendiff [--format <fmt>] <beforeFilePath> <afterFilePath>
 
 Options:
-  -h --help                     Show this screen
+  -h --help                     Show help screen
   -v --version                  Show gendiff version
   --format=<kn>                 Report format [default: pretty]
 
