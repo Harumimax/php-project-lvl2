@@ -5,11 +5,6 @@ namespace Differ\Tests;
 use PHPUnit\Framework\TestCase;
 
 use function \Differ\genDiff;
-use function \Differ\LibDiffer\getDataArray;
-use function \Differ\LibDiffer\findDiff;
-use function \Differ\LibDiffer\toStr;
-use function \Differ\LibDiffer\toPlain;
-use function \Differ\LibDiffer\toSimpleArray;
 
 class GenDiffTest extends TestCase
 {
@@ -80,70 +75,4 @@ class GenDiffTest extends TestCase
         $this->assertStringContainsString('"+ group3":{"foo":"bar","fee":"100500"}', $request);
     }
 
-
-    // --------------------------------- old tests ---------------------------
-
-    protected function setUp(): void
-    {
-        $this->before = ['timeout' => 50, 'host' => 'hexlet.io'];
-        $this->after = ['timeout' => 50, 'host' => 'new.host'];
-    }
-
-    public function testFindDiff()
-    {
-
-        $request = findDiff($this->before, $this->after);
-
-        $this->assertIsArray($request);
-
-        $this->assertEquals(2, sizeof($request));
-        $this->assertFalse(array_key_exists('timeout', $request));
-        $this->assertFalse(in_array('host', $request));
-    }
-
-
-    public function testNotEmpty()
-    {
-        $request = findDiff($this->before, $this->after);
-        
-        $this->assertFalse(empty(toStr($request)));
-    }
-
-    public function testToStr()
-    {
-        $data = findDiff($this->before, $this->after);
-        $request = toStr($data);
-            
-        $this->assertIsString($request);
-        $this->assertStringContainsString("hexlet.io", $request);
-        $this->assertStringContainsString("timeout", $request);
-        $this->assertStringContainsString("host", $request);
-    }
-
-    public function testToPlain()
-    {
-        $data = findDiff($this->before, $this->after);
-        $request = toPlain($data);
-            
-        $this->assertIsString($request);
-        $this->assertStringContainsString("hexlet.io", $request);
-        $this->assertStringContainsString("new.host", $request);
-        $this->assertStringContainsString("host", $request);
-        $this->assertFalse(strpos($request, "timeout"));
-    }
-
-    public function testToSimpleArray()
-    {
-        $data = findDiff($this->before, $this->after);
-        $request = toSimpleArray($data);
-            
-        $this->assertIsArray($request);
-        $this->assertEquals(3, sizeof($request));
-        $this->assertTrue(array_key_exists('timeout', $request));
-
-        $result = json_encode($request);
-        $this->assertStringContainsString("hexlet.io", $result);
-        $this->assertStringContainsString("new.host", $result);
-        $this->assertStringContainsString("host", $result);
-    }
 }

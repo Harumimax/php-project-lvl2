@@ -4,7 +4,20 @@
 use function \Differ\genDiff;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../src/docopt.php';
+
+const DOCOPT = <<<DOC
+Generate diff
+
+Usage:
+  gendiff (-h|--help)
+  gendiff [--format <fmt>] <beforeFilePath> <afterFilePath>
+
+Options:
+  -h --help                     Show help screen
+  -v --version                  Show gendiff version
+  --format=<kn>                 Report format [default: pretty]
+
+DOC;
 
 $params = array(
     'argv' => array_slice($_SERVER['argv'], 1),
@@ -13,7 +26,7 @@ $params = array(
     'optionsFirst' => false,
 );
 
-$handler = Docopt::handle($doc, $params);
+$handler = Docopt::handle(DOCOPT, $params);
 
 try {
     $beforeFilePath = $handler->args['<beforeFilePath>'];
