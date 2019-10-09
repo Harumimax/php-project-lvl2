@@ -1,12 +1,13 @@
 <?php
 
-namespace Differ;
+namespace Differ\engine;
 
-use function \Differ\LibDiffer\getDataArray;
-use function \Differ\LibDiffer\findDiff;
-use function \Differ\LibDiffer\toStr;
-use function \Differ\LibDiffer\toPlain;
-use function \Differ\LibDiffer\toSimpleArray;
+use function \Differ\functions\getDataArray;
+use function \Differ\functions\findDiff;
+
+use function Differ\formatters\toStr\toStr;
+use function Differ\formatters\toPlain\toPlain;
+use function Differ\formatters\toJson\toJson;
 
 function genDiff($beforeFile, $afterFile, $format)
 {
@@ -19,7 +20,7 @@ function genDiff($beforeFile, $afterFile, $format)
 
     switch ($format) :
         case "pretty":
-                $result = substr(toStr($diffOnArray), 0, -6) . "\n}" . "\n";
+                $result = toStr($diffOnArray) . "\n";
             break;
 
         case "plain":
@@ -27,7 +28,7 @@ function genDiff($beforeFile, $afterFile, $format)
             break;
 
         case "json":
-                $result = json_encode(toSimpleArray($diffOnArray)) . "\n";
+                $result = toJson($diffOnArray) . "\n";
             break;
 
         default:

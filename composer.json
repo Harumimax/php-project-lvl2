@@ -34,7 +34,10 @@
     "autoload": {
         "files": [
             "src/engine.php",
-            "src/LibDiffer/functions.php"
+            "src/formatters/toStr.php",
+            "src/formatters/toPlain.php",
+            "src/formatters/toJson.php",
+            "src/functions.php"
         ]
     }
 }
