@@ -45,10 +45,8 @@ function findDiff($beforeArr, $afterArr, $offset = 1): array
         } else {
             if (is_array($value)) {
                 $value['offset'] = $offset + 1;
-                return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
-            } else {
-                return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
             }
+            return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
         }
     }, array_keys($beforeArr), $beforeArr);
 
@@ -61,10 +59,9 @@ function findDiff($beforeArr, $afterArr, $offset = 1): array
 
         if (is_array($value)) {
             $value['offset'] = $offset + 1;
-            return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
-        } else {
-            return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
         }
+
+        return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
     }, array_keys($diffBetweenTwoArray), $diffBetweenTwoArray);
 
     return array_merge($prepareTreeFromBeforeArr, $newValuesFromAfterArr);
