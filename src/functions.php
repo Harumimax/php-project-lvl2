@@ -16,7 +16,6 @@ function getDataArray($filePath): array
         $result = Yaml::parseFile($filePath);
     } else {
         throw new \Exception("the {$fileName} is {$typeOfFile} format. Its not correct format. Must be JSON or YAML\n");
-        exit;
     }
 
     return $result;

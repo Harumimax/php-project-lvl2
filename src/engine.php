@@ -15,7 +15,6 @@ function genDiff($beforeFile, $afterFile, $format)
         $diffOnArray = findDiff(getDataArray($beforeFile), getDataArray($afterFile));
     } else {
         throw new \Exception("one or both files do not exist\n");
-        exit;
     }
 
     switch ($format) :
