@@ -10,12 +10,12 @@
     + setting5: {
           key5: value5
       }
-}
+    }
     group1: {
     + baz: bars
     - baz: bas
       foo: bar
-}
+    }
   - group2: {
        baz: bas
        abc: 12345

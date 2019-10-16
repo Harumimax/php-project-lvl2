@@ -40,7 +40,7 @@ function prepareString($diff): string
             return ["{$offset}+ {$value['key']}: {$value['new-value']}\n",
                     "{$offset}- {$value['key']}: {$value['old-value']}\n"];
         } elseif ($value['type'] == 'array') {
-            $arrayValue = toStr($value['value']);
+            $arrayValue = prepareString($value['value']);
             return "{$offset}  {$value['key']}: {$arrayValue}\n";
         }
     }, $diff);

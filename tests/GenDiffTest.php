@@ -17,7 +17,7 @@ class GenDiffTest extends TestCase
         $afterFilePath = 'tests/files/after.json';
         $format = 'pretty';
 
-        $expected = file_get_contents('tests/files/expected1');
+        $expected = file_get_contents('tests/files/expectedFormatPrettyFileJson');
 
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
@@ -29,7 +29,7 @@ class GenDiffTest extends TestCase
         $afterFilePath = 'tests/files/after.yaml';
         $format = 'pretty';
 
-        $expected = file_get_contents('tests/files/expected2');
+        $expected = file_get_contents('tests/files/expectedFormatPrettyFileYaml');
 
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
@@ -41,7 +41,7 @@ class GenDiffTest extends TestCase
         $afterFilePath = 'tests/files/after.json';
         $format = 'plain';
 
-        $expected = file_get_contents('tests/files/expected3');
+        $expected = file_get_contents('tests/files/expectedFormatPlainFileJson');
 
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
@@ -52,7 +52,7 @@ class GenDiffTest extends TestCase
         $afterFilePath = 'tests/files/after.json';
         $format = 'json';
 
-        $expected = file_get_contents('tests/files/expected4');
+        $expected = file_get_contents('tests/files/expectedFormatJsonFileJson');
 
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
