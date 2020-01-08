@@ -2,58 +2,51 @@
 
 namespace Differ\formatters\toStr;
 
-use Funct\Collection;
+use function Differ\formatters\changeBoolToString\changeBoolToString;
 
-function toStr($diff): string
+function toStr($diff, $level = 0)
 {
-    return substr(prepareString($diff), 0, -6) . "\n}";
+    $offset = str_repeat('    ', $level);
+    $resultArray = array_reduce($diff, function ($acc, $branch) use ($offset, $level) {
+
+        switch ($branch['type']) {
+            case 'same':
+                $acc[] = $offset . "    {$branch['key']}: " . prepareString($branch['old-value'], $level + 1);
+                break;
+            case 'changed':
+                $oldValue = $offset . "  - {$branch['key']}: " . prepareString($branch['old-value'], $level + 1);
+                $newValue = $offset . "  + {$branch['key']}: " . prepareString($branch['new-value'], $level + 1);
+                $acc[] = "{$oldValue}" . "\n" . "{$newValue}";
+                break;
+            case 'nested':
+                $acc[] = $offset . "    {$branch['key']}: " . toStr($branch['children'], $level + 1);
+                break;
+            case 'deleted':
+                $acc[] = $offset . "  - {$branch['key']}: " . prepareString($branch['old-value'], $level + 1);
+                break;
+            case 'added':
+                $acc[] = $offset . "  + {$branch['key']}: " . prepareString($branch['new-value'], $level + 1);
+                break;
+        }
+        return $acc;
+    }, []);
+
+    $result = implode("\n", $resultArray);
+    return "{" . "\n" . $result . "\n" . $offset .  "}";
 }
 
-
-function prepareString($diff): string
+function prepareString($value, $level)
 {
-    $resultArray = array_map(function ($value) {
+    if (!is_array($value)) {
+        return changeBoolToString($value);
+    }
 
-        if ($value['type'] == 'same' || $value['type'] == 'array') {
-            $offset = str_repeat("    ", $value['offset']);
-        } else {
-            $offset = str_repeat("    ", $value['offset'] - 1);
-        }
-            
+    $offsetForMap = str_repeat('    ', $level + 1);
+    $arrayValueForStr = array_map(function ($key) use ($value, $offsetForMap) {
+        $value = changeBoolToString($value);
+        return "{$offsetForMap}{$key}: {$value[$key]}";
+    }, array_keys($value));
 
-        if ($value['type'] == 'delete' || $value['type'] == 'new') {
-            if (is_array($value['value'])) {
-                $offsetForMap = str_repeat("    ", $value['value']['offset']);
-                $arrayValueForStr = array_map(function ($key, $value) use ($offsetForMap, $offset) {
-                    if ($key == 'offset') {
-                    } else {
-                        return "{$offsetForMap}{$key}: {$value}";
-                    }
-                }, array_keys($value['value']), $value['value']);
-
-                $valueToString = "{\n" . implode("\n", array_diff($arrayValueForStr, array(''))) . "\n{$offset}    }";
-            } else {
-                $valueToString = $value['value'];
-            }
-        }
-
-        if ($value['type'] == 'same') {
-            return "{$offset}{$value['key']}: {$value['value']}\n";
-        } elseif ($value['type'] == 'delete') {
-            return "{$offset}  - {$value['key']}: {$valueToString}\n";
-        } elseif ($value['type'] == 'new') {
-            return "{$offset}  + {$value['key']}: {$valueToString}\n";
-        } elseif ($value['type'] == 'change') {
-            return ["{$offset}  + {$value['key']}: {$value['new-value']}\n",
-                    "{$offset}  - {$value['key']}: {$value['old-value']}\n"];
-        } elseif ($value['type'] == 'array') {
-            $arrayValue = prepareString($value['value']);
-            return "{$offset}{$value['key']}: {$arrayValue}\n";
-        }
-    }, $diff);
-
-    $flattenedResultArray = Collection\flattenAll($resultArray);
-    $resultToString = implode('', $flattenedResultArray);
-
-    return "{\n{$resultToString}    }";
+    $offset = str_repeat('    ', $level);
+    return "{" . "\n" . implode("\n", array_diff($arrayValueForStr, array(''))) . "\n" . "{$offset}" . "}";
 }

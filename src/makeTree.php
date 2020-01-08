@@ -4,46 +4,38 @@ namespace Differ\makeTree;
 
 use Funct\Collection;
 
-function makeTree($beforeArr, $afterArr, $offset = 1): array
+function makeTree($dataBefore, $dataAfter): array
 {
-    $collectionFromBeforeArr = collect($beforeArr);
-    $unionOfTwoArray = $collectionFromBeforeArr->union($afterArr)->all();
+
+    $collectionFromBeforeArr = collect($dataBefore);
+    $unionOfTwoArray = $collectionFromBeforeArr->union($dataAfter)->all();
     // Вы правы, через union намного проще строить дерево
 
-    $result = array_map(function ($key, $value) use ($beforeArr, $afterArr, $offset) {
-        if (is_bool($value)) {
-            $value = changeTypeBoolToStr($value);
-        }
-
-        if (array_key_exists($key, $afterArr) && array_key_exists($key, $beforeArr)) {
-            if ($value == $afterArr[$key]) {
-                return ['type' => 'same', 'key' => $key, 'value' => $value, 'offset' => $offset];
+    $result = array_map(function ($key, $value) use ($dataBefore, $dataAfter) {
+        
+        if (array_key_exists($key, $dataAfter) && array_key_exists($key, $dataBefore)) {
+            if ($value == $dataAfter[$key]) {
+                return ['type' => 'same', 'key' => $key, 'old-value' => $dataBefore[$key],
+                'new-value' => $dataAfter[$key], 'children' => null];
             } else {
                 if (is_array($value)) {
-                    $arrayValue = makeTree($value, $afterArr[$key], $offset + 1);
-                    return ['type' => 'array', 'key' => $key, 'value' => $arrayValue, 'offset' => $offset];
+                    return ['type' => 'nested', 'key' => $key, 'old-value' => null,
+                    'new-value' => null, 'children' => makeTree($dataBefore[$key], $dataAfter[$key])];
                 } else {
-                    return ['type' => 'change', 'key' => $key, 'old-value' => $value,
-                            'new-value' => $afterArr[$key], 'offset' => $offset];
+                    return ['type' => 'changed', 'key' => $key, 'old-value' => $dataBefore[$key],
+                    'new-value' => $dataAfter[$key], 'children' => null];
                 }
             }
         } else {
-            if (is_array($value)) {
-                $value['offset'] = $offset + 1;
-            }
-
-            if (array_key_exists($key, $beforeArr)) {
-                return ['type' => 'delete', 'key' => $key, 'value' => $value, 'offset' => $offset];
+            if (array_key_exists($key, $dataBefore)) {
+                return ['type' => 'deleted', 'key' => $key, 'old-value' => $dataBefore[$key],
+                'new-value' => null, 'children' => null];
             } else {
-                return ['type' => 'new', 'key' => $key,'value' => $value, 'offset' => $offset];
+                return ['type' => 'added', 'key' => $key, 'old-value' => null,
+                'new-value' => $dataAfter[$key], 'children' => null];
             }
         }
     }, array_keys($unionOfTwoArray), $unionOfTwoArray);
 
     return $result;
-}
-
-function changeTypeBoolToStr(bool $value): string
-{
-    return ($value) ? "true" : "false";
 }

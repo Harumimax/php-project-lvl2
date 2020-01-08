@@ -21,8 +21,7 @@ class GenDiffTest extends TestCase
 
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
-
-    
+  
     public function testGenDiffFormatPrettyYaml()
     {
         $beforeFilePath = 'tests/files/before.yaml';
@@ -34,7 +33,6 @@ class GenDiffTest extends TestCase
         $this->assertEquals($expected, genDiff($beforeFilePath, $afterFilePath, $format));
     }
 
-    
     public function testGenDiffFormatPlainFileJson()
     {
         $beforeFilePath = 'tests/files/before.json';

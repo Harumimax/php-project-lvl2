@@ -33,7 +33,7 @@ try {
     $afterFilePath = $handler->args['<afterFilePath>'];
     $format = $handler->args['--format'];
 
-    echo genDiff($beforeFilePath, $afterFilePath, $format);
+    echo genDiff($beforeFilePath, $afterFilePath, $format) . "\n";
 } catch (Exception $e) {
     echo 'Exception: ',  $e->getMessage(), "\n";
 }
