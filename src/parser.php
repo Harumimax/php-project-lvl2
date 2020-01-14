@@ -11,7 +11,7 @@ function parseData($data, $format): array
     } elseif ($format == "yaml" || $format == "yml") {
         $result = Yaml::parse($data);
     } else {
-        throw new \Exception("Format {$format} is not correct . Must be JSON or YAML\n");
+        throw new \Exception("Format {$format} is not correct . Must be JSON or YAML");
     }
 
     return $result;

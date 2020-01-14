@@ -37,7 +37,7 @@
             "src/makeTree.php",
             "src/parser.php",
             "src/formatters/changeBoolToString.php",
-            "src/formatters/toStr.php",
+            "src/formatters/toPretty.php",
             "src/formatters/toPlain.php",
             "src/formatters/toJson.php"
         ]

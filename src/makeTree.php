@@ -8,34 +8,30 @@ function makeTree($dataBefore, $dataAfter): array
 {
 
     $collectionFromBeforeArr = collect($dataBefore);
-    $unionOfTwoArray = $collectionFromBeforeArr->union($dataAfter)->all();
-    // Вы правы, через union намного проще строить дерево
-
-    $result = array_map(function ($key, $value) use ($dataBefore, $dataAfter) {
-        
+    $result = $collectionFromBeforeArr->union($dataAfter)->map(function ($item, $key) use ($dataBefore, $dataAfter) {
         if (array_key_exists($key, $dataAfter) && array_key_exists($key, $dataBefore)) {
-            if ($value == $dataAfter[$key]) {
-                return ['type' => 'same', 'key' => $key, 'old-value' => $dataBefore[$key],
-                'new-value' => $dataAfter[$key], 'children' => null];
+            if ($item == $dataAfter[$key]) {
+                return ['type' => 'same', 'key' => $key, 'oldValue' => $dataBefore[$key],
+                'newValue' => $dataAfter[$key], 'children' => null];
             } else {
-                if (is_array($value)) {
-                    return ['type' => 'nested', 'key' => $key, 'old-value' => null,
-                    'new-value' => null, 'children' => makeTree($dataBefore[$key], $dataAfter[$key])];
+                if (is_array($item)) {
+                    return ['type' => 'nested', 'key' => $key, 'oldValue' => null,
+                    'newValue' => null, 'children' => makeTree($dataBefore[$key], $dataAfter[$key])];
                 } else {
-                    return ['type' => 'changed', 'key' => $key, 'old-value' => $dataBefore[$key],
-                    'new-value' => $dataAfter[$key], 'children' => null];
+                    return ['type' => 'changed', 'key' => $key, 'oldValue' => $dataBefore[$key],
+                    'newValue' => $dataAfter[$key], 'children' => null];
                 }
             }
         } else {
             if (array_key_exists($key, $dataBefore)) {
-                return ['type' => 'deleted', 'key' => $key, 'old-value' => $dataBefore[$key],
-                'new-value' => null, 'children' => null];
+                return ['type' => 'deleted', 'key' => $key, 'oldValue' => $dataBefore[$key],
+                'newValue' => null, 'children' => null];
             } else {
-                return ['type' => 'added', 'key' => $key, 'old-value' => null,
-                'new-value' => $dataAfter[$key], 'children' => null];
+                return ['type' => 'added', 'key' => $key, 'oldValue' => null,
+                'newValue' => $dataAfter[$key], 'children' => null];
             }
         }
-    }, array_keys($unionOfTwoArray), $unionOfTwoArray);
+    })->all();
 
     return $result;
 }
